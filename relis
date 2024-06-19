@@ -1,0 +1,89 @@
+from pygame import*
+from random import*
+import sys
+import os
+
+def resource_path(relative):
+    if hasattr(sys,"_MEIPASS"):
+        return os.path.join(sys._MEIPASS,relative)
+    return os.path.join(relative)
+font.init()
+font.SysFont("arial",30)
+lost=0
+score = 0
+win_width = 700
+win_height = 500
+coordinates = [90, 170, 250, 320]
+clock = time.Clock()
+window = display.set_mode((win_width, win_height))
+display.set_caption("Чарівна корзина")
+
+
+background= transform.scale(image.load(resource_path("backfon.jpg")), (win_width, win_height))
+
+class GameSprite(sprite.Sprite):
+    def __init__(self, player_image, player_x, player_y, size_x, size_y, player_speed):
+        sprite.Sprite._init__(self)
+        self.image= transform.scale(image.load(resource_path(player_image)), (size_x, size_y))
+        self.speed= player_speed
+        self.rect= self.image.get_rect()
+        self.rect.x= player_x
+        self.rect.y =player_y
+    def reset(self):
+        window.blit(self.image, (self.rect.x, self.rect.y))
+class Player(GameSprite):
+    def update(self):
+        keys = key.get_pressed()
+        if keys [K_a] and self.rect.x > 0:
+            self.rect.x -= self.speed
+        if keys [K_d] and self.rect.x < win_width - 100:
+            self.rect.x += self.speed
+class Aplle(GameSprite):
+    def update(self):
+        self.rect.y += self.speed
+        global lost
+        if self.rect.y > 450:
+            lost += 1
+            self.rect.y=0
+            self.rect.x =choice (coordinates)
+basket=Player("basket.png", 400, 340, 130, 170, 7)
+aplle = sprite.Group()
+for i in range(2):
+        aplle =  Aplle ("pngwing.com.png", choice (coordinates), -40, 80,40, randint(1, 5))
+        aplles.add(aplle)
+run = True
+while run:
+    for e in event.get():
+        window.blit(background, (0, 0))
+        for e in event.get():
+            if e.type == QUIT:
+                run =False
+        collision = sprite.spritecollide (basket, aplles, True)
+        for c in collision:
+            score += 1
+            aplle =  Aplle ("pngwing.com.png", choice (coordinates), -40, 80,40, randint(1, 5))
+            aplles.add(aplle)
+text1= font.render("Пропущено: " + str(lost), True, (255,255,255))
+window.blit(text1, (10, 60))
+text2= font.render("Зловлено: " + str(score), True, (255, 255, 255))
+window.blit(text2, (10, 20))
+
+Aplles.draw(window)
+Aplles.update()
+basket.reset()
+basket.update()
+
+if score >= 10:
+    run = False 
+    win = transform.scale(image.load(resource_path("win.jpg")), (win_width, win_height))
+    window.blit(win, (0, 0))
+    display.update()
+    time.wait(3000)
+if lost >= 1:
+    run = False
+    win = transform.scale(image.load(resource_path("lose.png"), (win_width, win_height)))
+    window.blit(win, (0, 0))
+    display.update()
+    time.wait(3000)
+clock.tick(60)
+display.update()
